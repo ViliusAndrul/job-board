@@ -1,10 +1,10 @@
 const db = require('../db');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoke');
+const jwt = require('jsonwebtoken');
 
 //Register function
 exports.register = (req, res) => {
-    const {username, email, passowrd, role} = req.body;
+    const {username, email, password, role} = req.body;
 
     //Check if user already exists
     const checkQuery = 'SELECT * FROM users WHERE email = ?';
@@ -27,7 +27,7 @@ exports.register = (req, res) => {
 
 //Login function
 exports.login = (req, res) => {
-    const {email, passowrd} = req.body;
+    const {email, password} = req.body;
 
     const query = 'SELECT * FROM users WHERE email = ?';
     db.query(query, [email], (err, result) => {
