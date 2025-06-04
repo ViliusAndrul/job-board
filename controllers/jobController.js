@@ -1,9 +1,9 @@
 const db = require('../db');
 
-//CREATE new job
+//CREATE a new job
 exports.createJob = (req, res) => {
     const {title, description, location, salary} = req.body;
-    const employer_id = req.use.id;
+    const employer_id = req.user.id;
 
     const sql = 'INSERT INTO jobs (employer_id, title, description, location, salary) VALUES (?, ?, ?, ?, ?)';
     db.query(sql, [employer_id, title, description, location, salary], (err, result) => {
@@ -45,7 +45,7 @@ exports.updateJob = (req, res) => {
         if(results.length === 0) return res.status(403).json({error: 'Not authorized to update this job'});
 
         //update the job
-        const updateSql = 'Update jobs Set title = ?, description = ?, salary = ? WHERE id = ?';
+        const updateSql = 'Update jobs Set title = ?, description = ?, location = ?, salary = ? WHERE id = ?';
         db.query(updateSql, [title, description, location, salary, jobId], (err) => {
             if(err) return res.status(500).json({error: 'Update failed'});
             res.json({message: 'Job updated successfully'});

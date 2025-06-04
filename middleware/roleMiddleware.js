@@ -6,7 +6,7 @@ module.exports = (requiredRole) => {
         }
 
         if(req.user.role !== requiredRole) {
-            return res.status(403).json({error: `Acess denied. Required role: ${requiredRole}`});
+            return res.status(403).json({error: `Access denied. Required role: ${requiredRole}`});
         }
 
         //user has correct role, continue

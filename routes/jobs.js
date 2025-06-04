@@ -17,8 +17,8 @@ router.get('/', getAllJobs);
 router.get('/:id', getJobById);
 
 //protected routes
-router.post('/', authMiddleware, roleMiddleware(['employer']), createJob);
-router.put('/:id', authMiddleware, roleMiddleware(['employer']), updateJob);
-router.delete('/:id', authMiddleware, roleMiddleware(['employer']), deleteJob);
+router.post('/', authMiddleware, roleMiddleware('employer'), createJob);
+router.put('/:id', authMiddleware, roleMiddleware('employer'), updateJob);
+router.delete('/:id', authMiddleware, roleMiddleware('employer'), deleteJob);
 
 module.exports = router;

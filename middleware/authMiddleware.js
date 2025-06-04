@@ -5,7 +5,7 @@ module.exports = (req, res, next) => {
     const authHeader = req.headers.authorization;
 
     //check if token exists and starts with 'bearer'
-    if(!authHeader || !authHeader.startWith('Bearer')) {
+    if(!authHeader || !authHeader.startsWith('Bearer')) {
         return res.status(401).json({error: 'No token provided'});
     }
 
@@ -20,6 +20,6 @@ module.exports = (req, res, next) => {
         //moving to actual route handler
         next();
     } catch(err) {
-        return req.status(401).json({error: 'Token is invalid or expired'});
+        return res.status(401).json({error: 'Token is invalid or expired'});
     }
 };
