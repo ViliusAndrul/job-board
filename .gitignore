@@ -49,4 +49,5 @@ logs/
 Thumbs.db
 
 #http testing
+tests/
 *.http
