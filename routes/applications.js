@@ -4,7 +4,6 @@ const { applyToJob, getByEmployer, getByUser } = require('../controllers/applica
 const authMiddleware = require('../middleware/authMiddleware');
 const roleMiddleware = require('../middleware/roleMiddleware');
 
-
 router.post('/',authMiddleware, roleMiddleware('job_seeker'), applyToJob);
 router.get('/employer/:id', authMiddleware, roleMiddleware('employer'), getByEmployer);
 router.get('/user/:id', authMiddleware, roleMiddleware('job_seeker'), getByUser);
