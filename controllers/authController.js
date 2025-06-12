@@ -4,26 +4,34 @@ const jwt = require('jsonwebtoken');
 
 //Register function
 exports.register = (req, res) => {
-    const {username, email, password, role} = req.body;
+  const { username, email, password, role } = req.body;
 
-    //Check if user already exists
-    const checkQuery = 'SELECT * FROM users WHERE email = ?';
-    db.query(checkQuery, [email], (err, result) => {
-        if(err) return res.status(500).json({error: 'Database error'});
-        if(result.length > 0) return res.status(400).json({error: 'Email already exists'});
+  const checkQuery = 'SELECT * FROM users WHERE email = ?';
+  db.query(checkQuery, [email], (err, result) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    if (result.length > 0) return res.status(400).json({ error: 'Email already exists' });
 
-        //Hashing password
-        bcrypt.hash(password, 10, (err, hash) => {
-            if(err) return res.status(500).json({error: 'Hashing error'});
+    bcrypt.hash(password, 10, (err, hash) => {
+      if (err) return res.status(500).json({ error: 'Hashing error' });
 
-            const insertQuery = 'INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)';
-            db.query(insertQuery, [username, email, hash, role], (err, result) => {
-                if(err) return res.status(500).json({ error: 'Insert failed'});
-                return res.status(201).json({message: 'User registered successfully'});
-            });
+      const insertQuery = 'INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)';
+      db.query(insertQuery, [username, email, hash, role], (err, result) => {
+        if (err) return res.status(500).json({ error: 'Insert failed' });
+
+        const newUserId = result.insertId;
+
+        // Create token for the new user
+        const token = jwt.sign({ id: newUserId, role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        res.status(201).json({
+          token,
+          user: { id: newUserId, username, role }
         });
+      });
     });
+  });
 };
+
 
 //Login function
 exports.login = (req, res) => {
