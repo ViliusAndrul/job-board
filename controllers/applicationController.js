@@ -6,6 +6,12 @@ exports.applyToJob = (req, res) => {
         return res.status(403).json({message: 'Only job seekers can apply'});
     }
     const {job_id, resume_url} = req.body;
+
+    const check = 'SELECT * FROM applications WHERE user_id = ? AND job_id = ?';
+  db.query(check, [userId, jobId], (err, result) => {
+    if (err) return res.status(500).json({ error: 'DB error' });
+    if (result.length > 0) return res.status(400).json({ error: 'Already applied' });
+    });
     const sql = 'INSERT INTO applications (job_id, user_id, resume_url) VALUES (?, ?, ?)';
     db.query(sql, [job_id, req.user.id, resume_url], (err, result) => {
         if (err) return res.status(500).json({error: err});
