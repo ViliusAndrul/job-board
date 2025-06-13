@@ -31,12 +31,12 @@ exports.applyToJob = (req, res) => {
 };
 
 
-//get applications by job for employers
+//get all job applications for employer
 exports.getByEmployer = (req, res) => {
     if (req.user.role !== 'employer') {
         return res.status(403).json({message: 'Only employers can view applications'});
     }
-    const employerId = req.params.id;
+    const employerId = req.user.id;
     const sql = `
     SELECT a.*, u.username, j.title
     FROM applications a
