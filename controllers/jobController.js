@@ -2,8 +2,15 @@ const db = require('../db');
 
 //CREATE a new job
 exports.createJob = (req, res) => {
+    if (req.user.role !== 'employer') {
+    return res.status(403).json({ message: 'Only employers can post jobs' });
+  }
     const {title, description, location, salary} = req.body;
     const employer_id = req.user.id;
+
+    if (!title || !description || !location || !salary) {
+    return res.status(400).json({ message: 'All fields are required' });
+  }
 
     const sql = 'INSERT INTO jobs (employer_id, title, description, location, salary) VALUES (?, ?, ?, ?, ?)';
     db.query(sql, [employer_id, title, description, location, salary], (err, result) => {
