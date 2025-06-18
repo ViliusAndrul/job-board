@@ -33,22 +33,27 @@ exports.applyToJob = (req, res) => {
 
 //get all job applications for employer
 exports.getByEmployer = (req, res) => {
-    if (req.user.role !== 'employer') {
-        return res.status(403).json({message: 'Only employers can view applications'});
-    }
-    const employerId = req.user.id;
-    const sql = `
-    SELECT a.*, u.username, j.title
-    FROM applications a
-    JOIN users u ON a.user_id = u.id
-    JOIN jobs j ON a.job_id = j.id
+  if (req.user.role !== 'employer') {
+    return res.status(403).json({ message: 'Only employers can view applications' });
+  }
+
+  const employerId = req.user.id; // safer than `req.params.id`
+
+  const sql = `
+    SELECT j.id AS job_id, j.title, a.id AS id, a.user_id, u.username, a.resume_url
+    FROM jobs j
+    LEFT JOIN applications a ON j.id = a.job_id 
+    LEFT JOIN users u ON a.user_id = u.id
     WHERE j.employer_id = ?
-    `;
-    db.query(sql, [employerId], (err, results) => {
-        if (err) return res.status(500).json({error: err});
-        res.json(results);
-    });
+    ORDER BY j.id
+  `;
+
+  db.query(sql, [employerId], (err, results) => {
+    if (err) return res.status(500).json({ error: err });
+    res.json(results);
+  });
 };
+
 
 //Get applications by user
 exports.getByUser = (req, res) => {
