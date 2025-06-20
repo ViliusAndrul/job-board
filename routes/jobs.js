@@ -13,7 +13,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 const roleMiddleware = require('../middleware/roleMiddleware');
 
 //public route
-router.get('/', getAllJobs);
+router.get('/', authMiddleware, roleMiddleware('job_seeker'), getAllJobs);
 router.get('/:id', getJobById);
 
 //protected routes

@@ -21,12 +21,28 @@ exports.createJob = (req, res) => {
 
 //READ all jobs
 exports.getAllJobs = (req, res) => {
-    const sql = 'SELECT jobs.*, users.username AS employer_name FROM jobs JOIN users ON jobs.employer_id = users.id ORDER BY created_at DESC';
-    db.query(sql, (err, results) => {
-        if(err) return res.status(500).json({error: 'Database read failed'});
-        res.json(results);
-    });
+  const userId = req.user?.id || null;
+  const sql = `
+    SELECT 
+      j.*, 
+      u.username AS employer_name,
+      CASE 
+        WHEN a.user_id IS NOT NULL THEN true 
+        ELSE false 
+      END AS applied
+    FROM jobs j
+    JOIN users u ON j.employer_id = u.id
+    LEFT JOIN applications a ON a.job_id = j.id AND a.user_id = ?
+    ORDER BY j.created_at DESC
+  `;
+
+  db.query(sql, [userId], (err, results) => {
+    if (err) return res.status(500).json({ error: 'Database read failed', details: err });
+
+    res.json(results);
+  });
 };
+
 
 //READ one job by ID
 exports.getJobById = (req, res) => {
