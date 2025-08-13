@@ -37,7 +37,7 @@ exports.getByEmployer = (req, res) => {
     return res.status(403).json({ message: 'Only employers can view applications' });
   }
 
-  const employerId = req.user.id; // safer than `req.params.id`
+  const employerId = req.user.id;
 
   const sql = `
     SELECT j.id AS job_id, j.title, a.id AS id, a.user_id, u.username, a.resume_url

@@ -61,13 +61,11 @@ exports.updateJob = (req, res) => {
     const employer_id = req.user.id;
     const {title, description, location, salary} = req.body;
 
-    //check if the job belongs to this employer
     const checkSql = 'SELECT * FROM jobs WHERE id = ? AND employer_id = ?';
     db.query(checkSql, [jobId, employer_id], (err, results) => {
         if(err) return res.status(500).json({error: 'Database error'});
         if(results.length === 0) return res.status(403).json({error: 'Not authorized to update this job'});
 
-        //update the job
         const updateSql = 'Update jobs Set title = ?, description = ?, location = ?, salary = ? WHERE id = ?';
         db.query(updateSql, [title, description, location, salary, jobId], (err) => {
             if(err) return res.status(500).json({error: 'Update failed'});

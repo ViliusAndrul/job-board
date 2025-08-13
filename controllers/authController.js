@@ -20,7 +20,6 @@ exports.register = (req, res) => {
 
         const newUserId = result.insertId;
 
-        // Create token for the new user
         const token = jwt.sign({ id: newUserId, role }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         res.status(201).json({
@@ -48,7 +47,6 @@ exports.login = (req, res) => {
             if(err) return res.status(500).json({error: 'Compare error'});
             if(!isMatch) return res.status(400).json({error: 'Invalid password'});
 
-            //Create JWT token
             const token = jwt.sign({id: user.id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '1h'});
             res.json({token, user:{id: user.id, username: user.username, role: user.role}});
         });
