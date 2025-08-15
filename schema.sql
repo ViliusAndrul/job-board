@@ -1,7 +1,7 @@
 CREATE DATABASE IF NOT EXISTS job_board;
 USE job_board;
 
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS users(
 id INT AUTO_INCREMENT PRIMARY KEY,
 username VARCHAR(100) NOT NULL,
 email VARCHAR(100) NOT NULL UNIQUE,
@@ -22,11 +22,12 @@ CREATE TABLE IF NOT EXISTS jobs(
     FOREIGN KEY (employer_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS applications (
+CREATE TABLE IF NOT EXISTS applications(
     id INT AUTO_INCREMENT PRIMARY KEY,
     job_id INT NOT NULL,
     user_id INT NOT NULL,
-    resume_url VARCHAR(255),
+    resume_filename VARCHAR(255),
+    cover_letter TEXT,
     status ENUM('pending', 'reviewed', 'accepted', 'rejected') DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE,

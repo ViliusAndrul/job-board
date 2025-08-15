@@ -6,13 +6,14 @@ exports.applyToJob = (req, res) => {
     return res.status(403).json({ message: 'Only job seekers can apply' });
   }
 
-  const { job_id, resume_url } = req.body;
-
+  const { job_id, cover_letter } = req.body;
   if (!job_id) {
     return res.status(400).json({ error: 'Missing job_id in request body' });
   }
 
   const userId = req.user.id;
+
+  const resumeFilename = req.file ? req.file.filename : null;
 
   const check = 'SELECT * FROM applications WHERE user_id = ? AND job_id = ?';
   db.query(check, [userId, job_id], (err, result) => {
@@ -22,8 +23,8 @@ exports.applyToJob = (req, res) => {
       return res.status(400).json({ error: 'Already applied' });
     }
 
-    const insert = 'INSERT INTO applications (job_id, user_id, resume_url) VALUES (?, ?, ?)';
-    db.query(insert, [job_id, userId, resume_url || null], (err, result) => {
+    const insert = 'INSERT INTO applications (job_id, user_id, resume_filename, cover_letter) VALUES (?, ?, ?, ?)';
+    db.query(insert, [job_id, userId, resumeFilename, cover_letter || null], (err, result) => {
       if (err) return res.status(500).json({ error: 'DB error during insert', details: err });
       res.json({ message: 'Application submitted', id: result.insertId });
     });
@@ -40,7 +41,7 @@ exports.getByEmployer = (req, res) => {
   const employerId = req.user.id;
 
   const sql = `
-    SELECT j.id AS job_id, j.title, a.id AS id, a.user_id, u.username, a.resume_url
+    SELECT j.id AS job_id, j.title, a.id AS id, a.user_id, u.username, a.resume_filename, cover_letter
     FROM jobs j
     LEFT JOIN applications a ON j.id = a.job_id 
     LEFT JOIN users u ON a.user_id = u.id
@@ -50,9 +51,18 @@ exports.getByEmployer = (req, res) => {
 
   db.query(sql, [employerId], (err, results) => {
     if (err) return res.status(500).json({ error: err });
-    res.json(results);
+
+    const updatedResults = results.map(app => ({
+      ...app,
+      resume_url: app.resume_filename
+        ? `${req.protocol}://${req.get('host')}/uploads/resumes/${app.resume_filename}`
+        : null
+    }));
+
+    res.json(updatedResults);
   });
 };
+
 
 
 //Get applications by user
